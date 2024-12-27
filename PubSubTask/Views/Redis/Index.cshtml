@@ -1,0 +1,67 @@
+﻿@{
+    ViewBag.Title = "Redis Pub/Sub";
+    var channels = ViewBag.Channels as List<string>;
+    var selectedChannel = ViewBag.SelectedChannel as string;
+    var messages = ViewBag.Messages as List<string>;
+}
+
+<div style="display: flex; height: 100vh; font-family: Arial, sans-serif;">
+  
+    <div style="width: 30%; border-right: 1px solid #ccc; padding: 10px; box-sizing: border-box;">
+        <h3>Channels</h3>
+        <form action="/Redis/AddChannel" method="post" style="margin-bottom: 10px;">
+            <input type="text" name="channelName" placeholder="Enter new channel" required style="width: 70%;" />
+            <button type="submit" style="width: 28%; background-color: orange; color: white; border: none; padding: 5px;">Make New Channel</button>
+        </form>
+        <ul style="list-style-type: none; padding: 0;">
+            @foreach (var channel in channels)
+            {
+                <li style="margin-bottom: 5px;">
+                    <form action="/Redis/Index" method="get" style="display: inline;">
+                        <input type="hidden" name="selectedChannel" value="@channel" />
+                        <button type="submit" style="width: 100%; text-align: left; padding: 5px; border: 1px solid orange; background-color: white;">
+                            @channel
+                        </button>
+                    </form>
+                </li>
+            }
+        </ul>
+    </div>
+
+    
+    <div style="width: 70%; padding: 10px; box-sizing: border-box;">
+        @if (string.IsNullOrWhiteSpace(selectedChannel))
+        {
+            <h3>Select a Channel</h3>
+        }
+        else
+        {
+            <h3>Channel: @selectedChannel</h3>
+            
+            <div style="border: 1px solid orange; padding: 10px; height: 70%; overflow-y: auto; margin-bottom: 10px;" id="messages-container">
+                @if (messages.Count == 0)
+                {
+                    <p>No messages yet.</p>
+                }
+                else
+                {
+                    <ul style="list-style-type: none; padding: 0;">
+                        @foreach (var message in messages)
+                        {
+                            <li style="margin-bottom: 5px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+                                @message
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+           
+            <form action="/Redis/SendMessage" method="post" style="display: flex; align-items: center;">
+                <input type="hidden" name="selectedChannel" value="@selectedChannel" />
+                <input type="text" name="message" placeholder="Enter message" required style="flex: 1; padding: 5px; border: 1px solid #ccc; margin-right: 10px;" />
+                <button type="submit" style="background-color: orange; color: white; border: none; padding: 5px 10px;">Send Message</button>
+            </form>
+        }
+    </div>
+
+</div>
